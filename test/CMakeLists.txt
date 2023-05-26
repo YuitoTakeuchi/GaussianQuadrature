@@ -1,24 +1,40 @@
 cmake_minimum_required(VERSION 3.25)
 
-# To use the googletest
+# GoogleTestをダウンロード
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  URL https://github.com/google/googletest/archive/refs/tags/release-1.12.0.zip
 )
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# 親プロジェクトのコンパイラ・リンカ設定を上書きするのを防ぐ（Windowsのみ）
+if(WIN32)
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
+
+# googletestをターゲットとして使えるようにする
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Generate executable file
-add_executable(Test ./test.cpp)
+# 単体テストの定義
+add_executable(Test test.cpp)
+target_include_directories (Test PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
 
-target_link_libraries(Test PRIVATE 
-    GTest::gtest_main
-    GaussQuadrature
+# external library
+    ${EIGEN3_INCLUDE_DIR}
+    ${json_SOURCE_DIR}/include
 )
 
+target_link_libraries(Test
+    gtest_main
+
+# external library
+    Eigen3::Eigen
+    nlohmann_json::nlohmann_json
+)
+
+# CTestへ単体テストを登録
 include(GoogleTest)
-gtest_discover_tests(Test)
+gtest_add_tests(TARGET Test)
