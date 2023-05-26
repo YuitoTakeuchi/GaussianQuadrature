@@ -156,21 +156,14 @@ public:
                         derivative(k-1, l) += 1.0/(points(k) - points(m));
                     }
                 } else {
+                    derivative(k-1, l) = 1.0/(points(l) - points(k));
                     for(int m = 0; m <= N; ++m) {
                         if(m == l || m == k) continue;
-                        derivative(k-1, l) += (points(k) - points(m))/(points(l) - points(m));
+                        derivative(k-1, l) *= (points(k) - points(m))/(points(l) - points(m));
                     }
-                    derivative(k-1, l) /= (points(l) - points(k));
                 }
             }
         }
-
-        // for(int k = 0; k < N; ++k) {
-        //     for(int m = 1; m <= N; ++m) {
-        //         derivative(k, 0) += (points(k) - points(m-1))/(-1 - points(m-1));
-        //     }
-        //     derivative(k, 0) /= -1 - points(k);
-        // }
     }
 };
 
