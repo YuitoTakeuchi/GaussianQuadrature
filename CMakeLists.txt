@@ -23,7 +23,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${json_SOURCE_DIR}/include
 )
 
-# add_subdirectory(test)
+add_subdirectory(test)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 # external libs
