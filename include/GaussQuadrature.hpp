@@ -21,21 +21,18 @@ public:
     // コンストラクタ
     GaussLegendreQuadrature () {
         // 行列を作る
+
+        // beta(i) = J(i, i+1) = J(i, i-1)
+        Eigen::VectorXd betas = Eigen::VectorXd::Zero(N-1);
+
+        for(int i = 0; i < N-1; ++i) {
+            betas(i) = (i+1.0) / sqrt((2.0*i+3.0) * (2.0*i+1.0));
+        }
+
         Eigen::MatrixXd J = Eigen::MatrixXd::Zero(N, N);
-        double prev_a, prev_b, prev_c;
-        prev_a = 1.0;
-        prev_b = 0.0;
-        prev_c = 0.0;
-        for(int i = 1; i < N; ++i) {
-            double a, b, c;
-            a = (2.0*i+1.0)/(i+1.0);
-            b = 0.0;
-            c = i/(i+1.0);
-            J(i-1, i) = sqrt(c/a/prev_a);
-            J(i, i-1) = J(i-1, i);
-            prev_a = a;
-            prev_b = b;
-            prev_c = c;
+        for(int i = 0; i < N-1; ++i) {
+            J(i, i+1) = betas(i);
+            J(i+1, i) = betas(i);
         }
 
         // 固有値と固有ベクトルを求める
