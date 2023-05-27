@@ -1,17 +1,27 @@
 #include "GaussQuadrature.hpp"
 #include <cmath>
 
-double f(double x) {
-    return x*x;
+double x(double t) {
+    return cos(t);
 }
 
-double f_o(double x) {
-    return f(x) / sqrt(1-x*x);
+Eigen::VectorXd x(Eigen::VectorXd t) {
+    Eigen::VectorXd ret = t;
+    for(int i = 0; i < ret.rows(); ++i) ret(i) = x(t(i));
+    return ret;
 }
 
 int main() {
-    int n;
-    std::cin >> n;
-    GaussQuadrature<LegendrePolynomial> gq;
-    std::cout << gq.integrate(n, -0.5, 0.5, &f_o) << std::endl;
+    const int n = 7;
+    // GaussQuadrature<LegendrePolynomial> gq;
+    // std::cout << gq.integrate(n, -0.5, 0.5, &f_o) << std::endl;
+    // Eigen::VectorXd weights, points;
+
+    GaussLegendreQuadrature<n> glq;
+    std::cout << glq.derivative << std::endl << std::endl;
+    std::cout << glq.points << std::endl << std::endl;
+
+    Eigen::VectorXd D = glq.derivative * x(glq.points);
+
+    std::cout << D << std::endl;
 }
