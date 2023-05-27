@@ -18,10 +18,10 @@ int main() {
     // Eigen::VectorXd weights, points;
 
     GaussLegendreQuadrature<n> glq;
-    std::cout << glq.derivative << std::endl << std::endl;
-    std::cout << glq.points << std::endl << std::endl;
+    std::cout << glq.get_derivative() << std::endl << std::endl;
+    std::cout << glq.get_points() << std::endl << std::endl;
 
-    Eigen::VectorXd D = glq.derivative * x(glq.points);
+    Eigen::VectorXd D = glq.get_derivative() * x(glq.get_points());
 
     std::cout << D << std::endl;
 }

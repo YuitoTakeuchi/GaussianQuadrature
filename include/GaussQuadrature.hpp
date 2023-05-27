@@ -77,7 +77,15 @@ public:
         }
     }
 
-    Eigen::VectorXd get_points {return points;}
-    Eigen::VectorXd get_weights {return weights;}
-    Eigen::MatrixXd get_derivative {return derivative;}
+    Eigen::VectorXd& get_points() {return points;}
+    Eigen::VectorXd& get_weights() {return weights;}
+    Eigen::MatrixXd& get_derivative() {return derivative;}
+
+    double integrate(double (*func)(double)) {
+        double ret = 0.0;
+        for(int i = 1; i <= N; ++i) {
+            ret += func(points(i)) * weights(i);
+        }
+        return ret;
+    }
 };
