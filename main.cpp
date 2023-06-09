@@ -8,8 +8,10 @@ double x(double t) {
 }
 
 Eigen::VectorXd x(Eigen::VectorXd t) {
-    Eigen::VectorXd ret = t;
-    for(int i = 0; i < ret.rows(); ++i) ret(i) = x(t(i));
+    const int n = t.rows();
+    Eigen::VectorXd ret = Eigen::VectorXd::Zero(n+1);
+    for(int i = 0; i < n; ++i) ret(i) = x(t(i));
+    ret(n) = cos(1.0);
     return ret;
 }
 
@@ -19,18 +21,19 @@ double f(double x) {
 }
 
 int main() {
-    const int n = 30;
-    // GaussQuadrature<LegendrePolynomial> gq;
-    // std::cout << gq.integrate(n, -0.5, 0.5, &f_o) << std::endl;
-    // Eigen::VectorXd weights, points;
+    constexpr int n = 20;
 
-    // GaussLegendreQuadrature<n> glq;
-    // std::cout << glq.get_derivative() << std::endl << std::endl;
-    // std::cout << glq.get_points() << std::endl << std::endl;
+    GaussLegendreQuadrature<n> glq;
 
-    // Eigen::VectorXd D = glq.get_derivative() * x(glq.get_points());
+    Eigen::VectorXd d = std::move(glq.get_derivative(x));
 
-    // std::cout << D << std::endl;
+    std::cout << "calculated |expected   \n";
+    std::cout << "-----------|-----------\n";
+    for(int i = 0; i < n; ++i) {
+        std::cout << std::setprecision(6) << std::setw(10);
+        std::cout << d(i) << " | " << -sin(glq.get_points()(i)) << "\n";
+    }
+    std::cout << "-----------|-----------\n";
 
     GaussHermiteQuadrature<n> ghq;
 
