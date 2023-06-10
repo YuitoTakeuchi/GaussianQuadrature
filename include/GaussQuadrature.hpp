@@ -2,6 +2,9 @@
 #include <cmath>
 
 #include <Eigen/Dense>
+#include <vector>
+#include <iostream>
+#include <iomanip>
 
 // \int_-1^1 f(x)dx
 // N is the number of nodes
@@ -93,6 +96,33 @@ public:
         }
         return ret;
     }
+    
+    template<int Dimension>
+    double integrage(double (*func)(Eigen::VectorXd x)) {
+        double ret = 0.0;
+        const long prod = pow(N, Dimension); // the number of iteration
+        std::vector<int> product_set(Dimension, 0); // the cartesian product set of indices
+        product_set[0] = -1;
+        for(int i = 0; i < prod; ++i) {
+            // create index list
+            for(int idx = 0; idx < Dimension; ++idx) {
+                if(++product_set[idx] < N) break;
+                product_set[idx] = 0;
+            }
+            Eigen::VectorXd point = Eigen::VectorXd::Zero(Dimension);
+
+            // calcurate i-th point and weight
+            int cnt = -1; // index of point
+            double weight = 1.0;
+            for(auto &j: product_set) {
+                point(++cnt) = points[j];
+                weight *= weights[j];
+            }
+            ret += func(point) * weight;
+        }
+
+        return ret;
+    }
 };
 
 template<int N>
@@ -148,6 +178,32 @@ public:
             // 漸化式のところをすべて2倍すればsqrt(2)はなくなる
             // 理由は要検証
             ret += func(points(i) / sqrt(2)) * weights(i); 
+        }
+        return ret;
+    }
+
+    template<int Dimension>
+    double integrage(double (*func)(Eigen::VectorXd x)) {
+        double ret = 0.0;
+        const long prod = pow(N, Dimension); // the number of iteration
+        std::vector<int> product_set(Dimension, 0); // the cartesian product set of indices
+        product_set[0] = -1;
+        for(int i = 0; i < prod; ++i) {
+            // create index list
+            for(int idx = 0; idx < Dimension; ++idx) {
+                if(++product_set[idx] < N) break;
+                product_set[idx] = 0;
+            }
+            Eigen::VectorXd point = Eigen::VectorXd::Zero(Dimension);
+
+            // calcurate i-th point and weight
+            int cnt = -1; // index of point
+            double weight = 1.0;
+            for(auto &j: product_set) {
+                point(++cnt) = points[j];
+                weight *= weights[j];
+            }
+            ret += func(point / sqrt(2)) * weight;
         }
         return ret;
     }
