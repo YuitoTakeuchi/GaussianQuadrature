@@ -103,8 +103,6 @@ public:
         const long prod = pow(N, Dimension); // the number of iteration
         std::vector<int> product_set(Dimension, 0); // the cartesian product set of indices
         product_set[0] = -1;
-        // std::cout << "x0              | x1              | f(x)            | weight\n";
-        // std::cout << "----------------|-----------------|-----------------|---------------\n";
         for(int i = 0; i < prod; ++i) {
             // create index list
             for(int idx = 0; idx < Dimension; ++idx) {
@@ -121,18 +119,8 @@ public:
                 weight *= weights[j];
             }
             ret += func(point) * weight;
-
-
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << point(0) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << point(1) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << func(point) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << weight << std::endl;
         }
-        // std::cout << "----------------|-----------------|-----------------|---------------\n";
+
         return ret;
     }
 };
@@ -200,8 +188,6 @@ public:
         const long prod = pow(N, Dimension); // the number of iteration
         std::vector<int> product_set(Dimension, 0); // the cartesian product set of indices
         product_set[0] = -1;
-        // std::cout << "x0              | x1              | f(x)            | weight\n";
-        // std::cout << "----------------|-----------------|-----------------|---------------\n";
         for(int i = 0; i < prod; ++i) {
             // create index list
             for(int idx = 0; idx < Dimension; ++idx) {
@@ -218,18 +204,7 @@ public:
                 weight *= weights[j];
             }
             ret += func(point / sqrt(2)) * weight;
-
-
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << point(0) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << point(1) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << func(point) << " | ";
-            // std::cout << std::setprecision(10) << std::setw(15);
-            // std::cout << weight << std::endl;
         }
-        // std::cout << "----------------|-----------------|-----------------|---------------\n";
         return ret;
     }
 };
