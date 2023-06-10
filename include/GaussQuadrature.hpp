@@ -1,9 +1,5 @@
 #pragma once
-#include <iostream>
 #include <cmath>
-#include <vector>
-#include <numeric>
-#include <algorithm>
 
 #include <Eigen/Dense>
 
@@ -14,7 +10,7 @@ class GaussLegendreQuadrature {
 private:
     Eigen::VectorXd points = Eigen::VectorXd::Zero(N);
     Eigen::VectorXd weights = Eigen::VectorXd::Zero(N);
-    Eigen::MatrixXd derivative = Eigen::MatrixXd::Zero(N, N+1);
+    Eigen::MatrixXd derivative_matrix = Eigen::MatrixXd::Zero(N, N+1);
 
 
 public:
@@ -40,50 +36,115 @@ public:
 
         // 固有値と固有ベクトルを求める
         Eigen::EigenSolver<Eigen::MatrixXd> eigens(J);
-        points = Eigen::VectorXd::Zero(N+1);
-        weights = Eigen::VectorXd::Zero(N+1);
+        points = Eigen::VectorXd::Zero(N);
+        weights = Eigen::VectorXd::Zero(N);
         Eigen::MatrixXd eigen_vectors = eigens.eigenvectors().real();
         Eigen::VectorXd eigen_values  = eigens.eigenvalues().real();
 
         // 固有値と固有ベクトルから重みとノードを求める．
-        // 点を小さい順に並び替える
-        std::vector<int> indices(N);
-        std::iota(indices.begin(), indices.end(), 0);
-        std::sort(indices.begin(), indices.end(), [&eigen_values](int i1, int i2) {return eigen_values(i1) < eigen_values(i2);});
-        int cnt = 1;
-        points(0) = -1.0;
-        for(int& i: indices) {
-            points(cnt)  = eigen_values(i);
+        for(int i = 0; i < N; ++i) {
+            points(i)  = eigen_values(i);
             Eigen::VectorXd eigen_vector =  eigen_vectors.col(i).normalized();
-            weights(cnt) = 2.0*eigen_vector(0)*eigen_vector(0);
-            cnt += 1;
+            weights(i) = eigen_vector(0)*eigen_vector(0) * 2.0;
         }
 
-        for(int k = 1; k <= N; ++k) {
-            for(int l = 0; l <= N; ++l) {
+        // 微分行列を計算
+        // -1.0のところは適当なので（かぶらなければ）なんでもok
+        for(int k = 0; k < N; ++k) {
+            for(int l = 0; l < N; ++l) {
                 if(k == l) {
-                    for(int m = 0; m <= N; ++m) {
+                    for(int m = 0; m < N; ++m) {
                         if(m == k) continue;
-                        derivative(k-1, l) += 1.0/(points(k) - points(m));
+                        derivative_matrix(k, l) += 1.0/(points(k) - points(m));
                     }
+                    derivative_matrix(k, l) += 1.0 / (points(k) + 1.0);
                 } else {
-                    derivative(k-1, l) = 1.0/(points(l) - points(k));
-                    for(int m = 0; m <= N; ++m) {
+                    derivative_matrix(k, l) = 1.0/(points(l) - points(k));
+                    for(int m = 0; m < N; ++m) {
                         if(m == l || m == k) continue;
-                        derivative(k-1, l) *= (points(k) - points(m))/(points(l) - points(m));
+                        derivative_matrix(k, l) *= (points(k) - points(m))/(points(l) - points(m));
                     }
+                    derivative_matrix(k, l) *= (points(k) + 1.0)/(points(l) + 1.0);
                 }
+            }
+            derivative_matrix(k, N) = 1.0/(-1.0 - points(k));
+            for(int m = 0; m < N; ++m) {
+                if(m == k) continue;
+                derivative_matrix(k, N) *= (points(k) - points(m))/(-1.0 - points(m));
             }
         }
     }
+    const Eigen::VectorXd& get_points() {return points;}
+    const Eigen::VectorXd& get_weights() {return weights;}
+    const Eigen::MatrixXd& get_derivative_matrix() {return derivative_matrix;}
 
-    Eigen::VectorXd& get_points() {return points;}
-    Eigen::VectorXd& get_weights() {return weights;}
-    Eigen::MatrixXd& get_derivative() {return derivative;}
+    Eigen::VectorXd get_derivative(double (*func)(double)) const {
+        Eigen::VectorXd _val = Eigen::VectorXd::Zero(N+1);
+        for(int i = 0; i < N; ++i) _val(i) = func(points(i));
+        _val(N) = func(-1.0);
+        Eigen::VectorXd derivative = derivative_matrix * _val;
+        return derivative;
+    }
 
     double integrate(double (*func)(double)) {
         double ret = 0.0;
-        for(int i = 1; i <= N; ++i) {
+        for(int i = 0; i < N; ++i) {
+            ret += func(points(i)) * weights(i);
+        }
+        return ret;
+    }
+};
+
+template<int N>
+class GaussHermiteQuadrature {
+private:
+    Eigen::VectorXd points = Eigen::VectorXd::Zero(N);
+    Eigen::VectorXd weights = Eigen::VectorXd::Zero(N);
+
+
+public:
+    // コンストラクタ
+    GaussHermiteQuadrature () {
+        // 行列を作る
+        // pj = (aj x + bj)p_j-1 - cj p_j-2のとき
+        // Hermiteでは aj = 1, bj = 0, cj = j-1
+        Eigen::MatrixXd J = Eigen::MatrixXd::Zero(N, N);
+        double prev_a;//, prev_b, prev_c;
+        prev_a = 2.0;
+        // prev_b = 0.0;
+        // prev_c = 0.0;
+        for(int i = 1; i < N; ++i) {
+            double a, b, c;
+            a = 2.0;
+            b = 0.0;
+            c = 2.0*i;
+            J(i-1, i) = sqrt(c/a/prev_a);
+            J(i, i-1) = J(i-1, i);
+            prev_a = a;
+            // prev_b = b;
+            // prev_c = c;
+        }
+
+        // 固有値と固有ベクトルを求める
+        Eigen::EigenSolver<Eigen::MatrixXd> eigens(J);
+        points = Eigen::VectorXd::Zero(N);
+        weights = Eigen::VectorXd::Zero(N);
+        Eigen::MatrixXd eigen_vectors = eigens.eigenvectors().real();
+        Eigen::VectorXd eigen_values  = eigens.eigenvalues().real();
+
+        // 固有値と固有ベクトルから重みとノードを求める．
+        for(int i = 0; i < N; ++i) {
+            points(i)  = eigen_values(i);
+            Eigen::VectorXd eigen_vector =  eigen_vectors.col(i).normalized();
+            weights(i) = eigen_vector(0)*eigen_vector(0) * sqrt(M_PI);
+        }
+    }
+    const Eigen::VectorXd& get_points() const {return points;}
+    const Eigen::VectorXd& get_weights() const {return weights;}
+
+    double integrate(double (*func)(double)) const {
+        double ret = 0.0;
+        for(int i = 0; i < N; ++i) {
             ret += func(points(i)) * weights(i);
         }
         return ret;
