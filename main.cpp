@@ -23,38 +23,29 @@ double f(double x) {
 int main() {
     constexpr int n = 20;
 
-    // GaussLegendreQuadrature<n> glq;
+    GaussLegendreQuadrature<n> glq;
 
-    // Eigen::VectorXd d = std::move(glq.get_derivative(x));
+    Eigen::VectorXd d = std::move(glq.get_derivative(x));
 
-    // std::cout << "calculated |expected   \n";
-    // std::cout << "-----------|-----------\n";
-    // for(int i = 0; i < n; ++i) {
-    //     std::cout << std::setprecision(6) << std::setw(10);
-    //     std::cout << d(i) << " | " << -sin(glq.get_points()(i)) << "\n";
-    // }
-    // std::cout << "-----------|-----------\n";
+    std::cout << "calculated |expected   \n";
+    std::cout << "-----------|-----------\n";
+    for(int i = 0; i < n; ++i) {
+        std::cout << std::setprecision(6) << std::setw(10);
+        std::cout << d(i) << " | " << -sin(glq.get_points()(i)) << "\n";
+    }
+    std::cout << "-----------|-----------\n";
 
     GaussHermiteQuadrature <n> ghq;
-    GaussHermiteQuadratureT<n> ghqt; // test for different coefficients
 
-
-    // std::cout << "point      |weight     \n";
-    // std::cout << "-----------|-----------\n";
-    // for(int i = 0; i < n; ++i) {
-    //     std::cout << std::setprecision(6) << std::setw(10);
-    //     std::cout << ghq.get_points()(i) << " | " << ghq.get_weights()(i) << "\n";
-    // }
-    // std::cout << "-----------|-----------\n";
+    std::cout << "point      |weight     \n";
+    std::cout << "-----------|-----------\n";
+    for(int i = 0; i < n; ++i) {
+        std::cout << std::setprecision(6) << std::setw(10);
+        std::cout << ghq.get_points()(i) << " | " << ghq.get_weights()(i) << "\n";
+    }
+    std::cout << "-----------|-----------\n";
 
     double ret = ghq.integrate(f) / sqrt(M_PI);
-    double retT = ghqt.integrate(f) / sqrt(M_PI);
-    std::cout << "He (physits)         | H (probabilists)\n";
-    std::cout << "---------------------|----------------------\n";
     std::cout << std::setprecision(15) << std::setw(20);
-    std::cout << ret  << " | " << retT << std::endl;
-    std::cout << "--------------------------------------------\n";
-    std::cout << "ratio: " << ret / retT << std::endl;
-    //     std::cout << std::setprecision(6) << std::setw(10);
-    //     std::cout << ghq.get_points()(i) << " | " << ghq.get_weights()(i) << "\n";
+    std::cout << ret << std::endl;
 }
