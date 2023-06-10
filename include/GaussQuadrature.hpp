@@ -110,14 +110,14 @@ public:
         // Hermiteでは aj = 1, bj = 0, cj = j-1
         Eigen::MatrixXd J = Eigen::MatrixXd::Zero(N, N);
         double prev_a;//, prev_b, prev_c;
-        prev_a = 2.0;
+        prev_a = 1.0;
         // prev_b = 0.0;
         // prev_c = 0.0;
         for(int i = 1; i < N; ++i) {
             double a, b, c;
-            a = 2.0;
+            a = 1.0;
             b = 0.0;
-            c = 2.0*i;
+            c = 1.0*i;
             J(i-1, i) = sqrt(c/a/prev_a);
             J(i, i-1) = J(i-1, i);
             prev_a = a;
@@ -145,7 +145,9 @@ public:
     double integrate(double (*func)(double)) const {
         double ret = 0.0;
         for(int i = 0; i < N; ++i) {
-            ret += func(points(i)) * weights(i);
+            // 漸化式のところをすべて2倍すればsqrt(2)はなくなる
+            // 理由は要検証
+            ret += func(points(i) / sqrt(2)) * weights(i); 
         }
         return ret;
     }
