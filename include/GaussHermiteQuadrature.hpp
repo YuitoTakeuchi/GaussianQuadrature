@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include <Eigen/Dense>
+#include <lapacke.h>
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -18,7 +19,9 @@ public:
         // 行列を作る
         // pj = (aj x + bj)p_j-1 - cj p_j-2のとき
         // Hermiteでは aj = 1, bj = 0, cj = j-1
-        Eigen::MatrixXd J = Eigen::MatrixXd::Zero(N, N);
+
+        double d[N], e[N-1], z[N*N];
+        memset(d, 0, N);
         double prev_a;//, prev_b, prev_c;
         prev_a = 1.0;
         // prev_b = 0.0;
@@ -28,25 +31,18 @@ public:
             a = 1.0;
             b = 0.0;
             c = 1.0*i;
-            J(i-1, i) = sqrt(c/a/prev_a);
-            J(i, i-1) = J(i-1, i);
+            e[i-1] = sqrt(c/a/prev_a);
             prev_a = a;
             // prev_b = b;
             // prev_c = c;
         }
 
-        // 固有値と固有ベクトルを求める
-        Eigen::EigenSolver<Eigen::MatrixXd> eigens(J);
-        points = Eigen::VectorXd::Zero(N);
-        weights = Eigen::VectorXd::Zero(N);
-        Eigen::MatrixXd eigen_vectors = eigens.eigenvectors().real();
-        Eigen::VectorXd eigen_values  = eigens.eigenvalues().real();
+        LAPACKE_dstev(LAPACK_COL_MAJOR, 'V', N, d, e, z, N);
 
         // 固有値と固有ベクトルから重みとノードを求める．
         for(int i = 0; i < N; ++i) {
-            points(i)  = eigen_values(i);
-            Eigen::VectorXd eigen_vector =  eigen_vectors.col(i).normalized();
-            weights(i) = eigen_vector(0)*eigen_vector(0) * sqrt(M_PI);
+            points(i)  = d[i];
+            weights(i) = z[i*N] * z[i*N] * sqrt(M_PI);
         }
     }
     const Eigen::VectorXd& get_points() const {return points;}
