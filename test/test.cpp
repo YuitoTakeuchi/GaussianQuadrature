@@ -65,78 +65,78 @@ namespace {
     class DerivativeTest: public::testing::Test{};
     TEST_F(DerivativeTest, integral_test_1_order_1) {
         Eigen::VectorXd expected = d_test_func_1(glq1.get_points());
-        Eigen::VectorXd calculated = glq1.get_derivative() * vector_wrapper(&test_func_1, glq1.get_points());
+        Eigen::VectorXd calculated = glq1.get_derivative(test_func_1);
 
         for(int i = 0; i < 1; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
 
     TEST_F(DerivativeTest, derivative_test_2_order_1) {
         Eigen::VectorXd expected = d_test_func_1(glq2.get_points());
-        Eigen::VectorXd calculated = glq2.get_derivative() * vector_wrapper(&test_func_1, glq2.get_points());
+        Eigen::VectorXd calculated = glq2.get_derivative(test_func_1);
 
         for(int i = 0; i < 2; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
     TEST_F(DerivativeTest, derivative_test_2_order_2) {
         Eigen::VectorXd expected = d_test_func_2(glq2.get_points());
-        Eigen::VectorXd calculated = glq2.get_derivative() * vector_wrapper(&test_func_2, glq2.get_points());
+        Eigen::VectorXd calculated = glq2.get_derivative(test_func_2);// * vector_wrapper(&test_func_2, glq2.get_points());
 
         for(int i = 0; i < 2; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
 
     TEST_F(DerivativeTest, derivative_test_19_order_1) {
         Eigen::VectorXd expected = d_test_func_1(glq19.get_points());
-        Eigen::VectorXd calculated = glq19.get_derivative() * vector_wrapper(&test_func_1, glq19.get_points());
+        Eigen::VectorXd calculated = glq19.get_derivative(test_func_1);// * vector_wrapper(&test_func_1, glq19.get_points());
 
         for(int i = 0; i < 19; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
     TEST_F(DerivativeTest, derivative_test_19_order_2) {
         Eigen::VectorXd expected = d_test_func_2(glq19.get_points());
-        Eigen::VectorXd calculated = glq19.get_derivative() * vector_wrapper(&test_func_2, glq19.get_points());
+        Eigen::VectorXd calculated = glq19.get_derivative(test_func_2);// * vector_wrapper(&test_func_2, glq19.get_points());
 
         for(int i = 0; i < 19; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
     TEST_F(DerivativeTest, derivative_test_19_order_3) {
         Eigen::VectorXd expected = d_test_func_3(glq19.get_points());
-        Eigen::VectorXd calculated = glq19.get_derivative() * vector_wrapper(&test_func_3, glq19.get_points());
+        Eigen::VectorXd calculated = glq19.get_derivative(test_func_3);// * vector_wrapper(&test_func_3, glq19.get_points());
 
         for(int i = 0; i < 19; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
 
 
     TEST_F(DerivativeTest, derivative_test_20_order_1) {
         Eigen::VectorXd expected = d_test_func_1(glq20.get_points());
-        Eigen::VectorXd calculated = glq20.get_derivative() * vector_wrapper(&test_func_1, glq20.get_points());
+        Eigen::VectorXd calculated = glq20.get_derivative(test_func_1);// * vector_wrapper(&test_func_1, glq20.get_points());
 
         for(int i = 0; i < 20; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
     TEST_F(DerivativeTest, derivative_test_20_order_2) {
         Eigen::VectorXd expected = d_test_func_2(glq20.get_points());
-        Eigen::VectorXd calculated = glq20.get_derivative() * vector_wrapper(&test_func_2, glq20.get_points());
+        Eigen::VectorXd calculated = glq20.get_derivative(test_func_2);// * vector_wrapper(&test_func_2, glq20.get_points());
 
         for(int i = 0; i < 20; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
     TEST_F(DerivativeTest, derivative_test_20_order_3) {
         Eigen::VectorXd expected = d_test_func_3(glq20.get_points());
-        Eigen::VectorXd calculated = glq20.get_derivative() * vector_wrapper(&test_func_3, glq20.get_points());
+        Eigen::VectorXd calculated = glq20.get_derivative(test_func_3);// * vector_wrapper(&test_func_3, glq20.get_points());
 
         for(int i = 0; i < 20; ++i) {
-            EXPECT_NEAR(calculated(i), expected(i+1), 1e-12);
+            EXPECT_NEAR(calculated(i), expected(i), 1e-12);
         }
     }
 
