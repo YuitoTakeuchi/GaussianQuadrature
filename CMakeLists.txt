@@ -1,34 +1,39 @@
 cmake_minimum_required(VERSION 3.25)
-include(FetchContent)
 
 set(PROJECT_NAME main)
 project (${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME} main.cpp)
 
-# eigen
-find_package(Eigen3 REQUIRED)
+find_package(PkgConfig)
 
-# nlohmann json
-FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.10.4
-)
-FetchContent_MakeAvailable(json)
+pkg_check_modules(EIGEN3  REQUIRED Eigen3)
+pkg_check_modules(LAPACK  REQUIRED lapack)
+pkg_check_modules(LAPACKE REQUIRED lapacke)
+pkg_check_modules(BLAS REQUIRED blas)
 
 target_include_directories(${PROJECT_NAME} 
-    PUBLIC ${PROJECT_SOURCE_DIR}/include/
-    PUBLIC ${EIGEN3_INCLUDE_DIR}
-    PUBLIC ${json_SOURCE_DIR}/include
+    PUBLIC ${PROJECT_SOURCE_DIR}/include
+    PUBLIC ${EIGEN3_INCLUDE_DIRS}
+    PUBLIC ${LAPACK_INCLUDE_DIRS}
+    PUBLIC ${LAPACKE_INCLUDE_DIRS}
+    PUBLIC ${BLAS_INCLUDE_DIRS}
+)
+
+target_link_directories(${PROJECT_NAME} 
+    PUBLIC ${LAPACK_LIBRARY_DIRS}
+    PUBLIC ${LAPACKE_LIBRARY_DIRS}
+    PUBLIC ${BLAS_LIBRARY_DIRS}
 )
 
 add_subdirectory(test)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 # external libs
-    PUBLIC Eigen3::Eigen
-    PUBLIC nlohmann_json::nlohmann_json
+    PUBLIC ${EIGEN3_LIBRARIES}
+    PUBLIC ${LAPACK_LIBRARIES}
+    PUBLIC ${LAPACKE_LIBRARIES}
+    PUBLIC ${BLAS_LIBRARIES}
 )
 
 # コンパイラ設定
