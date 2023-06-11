@@ -19,20 +19,36 @@ enable_testing()
 
 # 単体テストの定義
 add_executable(Test test.cpp)
-target_include_directories (Test PRIVATE
-    ${PROJECT_SOURCE_DIR}/include
 
-# external library
-    ${EIGEN3_INCLUDE_DIR}
-    ${json_SOURCE_DIR}/include
+find_package(PkgConfig)
+
+pkg_check_modules(EIGEN3  REQUIRED Eigen3)
+pkg_check_modules(LAPACK  REQUIRED lapack)
+pkg_check_modules(LAPACKE REQUIRED lapacke)
+pkg_check_modules(BLAS REQUIRED blas)
+
+target_include_directories(Test PRIVATE
+    PUBLIC ${PROJECT_SOURCE_DIR}/include
+
+    PUBLIC ${EIGEN3_INCLUDE_DIRS}
+    PUBLIC ${LAPACK_INCLUDE_DIRS}
+    PUBLIC ${LAPACKE_INCLUDE_DIRS}
+    PUBLIC ${BLAS_INCLUDE_DIRS}
 )
 
-target_link_libraries(Test
-    gtest_main
+target_link_directories(Test PRIVATE
+    PUBLIC ${LAPACK_LIBRARY_DIRS}
+    PUBLIC ${LAPACKE_LIBRARY_DIRS}
+    PUBLIC ${BLAS_LIBRARY_DIRS}
+)
 
-# external library
-    Eigen3::Eigen
-    nlohmann_json::nlohmann_json
+target_link_libraries(Test PRIVATE
+    gtest_main
+# external libs
+    PUBLIC ${EIGEN3_LIBRARIES}
+    PUBLIC ${LAPACK_LIBRARIES}
+    PUBLIC ${LAPACKE_LIBRARIES}
+    PUBLIC ${BLAS_LIBRARIES}
 )
 
 # CTestへ単体テストを登録
